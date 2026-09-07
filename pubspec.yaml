@@ -1,0 +1,42 @@
+name: quan_ly_rau
+description: >-
+  Quản Lý Rau - App quản lý sổ sách cho tiểu thương rau củ (Nhập hàng sáng /
+  Chốt giá tối / Sổ nợ / Báo cáo lời lỗ), kết nối Supabase.
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+  flutter: '>=3.22.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Supabase backend
+  supabase_flutter: ^2.7.1
+
+  # Android contacts + permissions
+  flutter_contacts: ^1.1.9+2
+  permission_handler: ^11.3.1
+
+  # Offline cache + connectivity
+  shared_preferences: ^2.3.2
+  connectivity_plus: ^6.0.5
+
+  # State management (lightweight, ChangeNotifier based)
+  provider: ^6.1.2
+
+  # Formatting (money, dates)
+  intl: ^0.19.0
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
