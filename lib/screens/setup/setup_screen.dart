@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../core/config.dart';
 import '../../core/theme.dart';
-import '../../core/widgets.dart';
 
 /// Shown on first launch when Supabase credentials are still placeholders.
 /// Explains (in Vietnamese) the 3 setup steps a developer must do.

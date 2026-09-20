@@ -4,7 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 
-import '../theme.dart';
+import 'theme.dart';
 
 /// ────────────────────────────────────────────────────────────────────────
 /// BIG BUTTON — the one true button of the app (>= 64dp height)

@@ -8,7 +8,13 @@ linter:
     use_full_hex_values_for_flutter_colors: true
     avoid_print: true
     unawaited_futures: false
+    # Pure style/perf hint: firing on ~35 legitimately non-const widget
+    # constructions would drown out real problems in `flutter analyze`.
+    prefer_const_constructors: false
 
 analyzer:
   errors:
     deprecated_member_use: ignore
+  exclude:
+    - build/**
+    - android/**

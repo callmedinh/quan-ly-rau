@@ -21,12 +21,15 @@ Future<Supplier?> pickSupplierFromContacts(BuildContext context) async {
   final messenger = ScaffoldMessenger.of(context);
 
   final granted = await services.contacts.ensurePermission();
+  if (!context.mounted) return null;
+
   if (!granted) {
     final openSettings = await _showPermissionDialog(context);
     if (openSettings == true) await openAppSettings();
     return null;
   }
 
+  if (!context.mounted) return null;
   final Contact? picked = await _showContactPickerSheet(context);
   if (picked == null || !context.mounted) return null;
 

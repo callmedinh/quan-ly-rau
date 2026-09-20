@@ -27,14 +27,13 @@ class ContactsService {
   /// Fallback native picker — needs NO READ_CONTACTS permission on Android
   /// (uses the system contacts picker activity).
   Future<Contact?> pickWithSystemPicker() async {
-    return FlutterContacts.openContactPicker();
+    return FlutterContacts.openExternalPick();
   }
 
   /// Display name — falls back to the first phone number.
   static String displayName(Contact c) {
     if (c.displayName.trim().isNotEmpty) return c.displayName.trim();
-    final n = phoneOf(c);
-    return n == null ? 'Liên hệ' : n;
+    return phoneOf(c) ?? 'Liên hệ';
   }
 
   /// First phone number of a contact, or null.

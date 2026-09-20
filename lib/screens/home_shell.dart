@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../core/theme.dart';
 import '../services/app_services.dart';
-import '../services/connectivity_service.dart';
 import 'dashboard/dashboard_screen.dart';
 import 'debts/debts_screen.dart';
 import 'quick_import/quick_import_screen.dart';

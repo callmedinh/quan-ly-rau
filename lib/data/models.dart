@@ -19,8 +19,7 @@ DateTime? asDate(Object? value) {
   return DateTime.tryParse(value.toString());
 }
 
-String? asText(Object? value) =>
-    value == null ? null : value.toString();
+String? asText(Object? value) => value?.toString();
 
 /// ────────────────────────────────────────────────────────────────────────
 /// 1. Supplier — suppliers table

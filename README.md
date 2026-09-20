@@ -63,16 +63,28 @@ Nhập nhanh:              Chốt giá & xem lời lỗ:
 2. Dán toàn bộ nội dung file **`supabase/migrations/0001_init.sql`** → **Run**.
 3. Vào **Settings → API**: copy **Project URL** và **anon public key**.
 
-### 3. Cấu hình khoá
-Cách nhanh (sửa file trước khi build):
+### 3. Cấu hình khoá (không commit khoá — khuyến nghị)
 
-```dart
-// lib/core/config.dart
-static const String supabaseUrl = 'https://YOUR-PROJECT-REF.supabase.co';
-static const String supabaseAnonKey = 'eyJhbGciOi...';
+Copy file mẫu rồi điền giá trị thật của bạn:
+
+```bash
+copy dart_defines.example.json dart_defines.json
 ```
 
-Cách chuẩn (không commit khoá — khuyến nghị):
+```json
+{
+  "SUPABASE_URL": "https://YOUR-PROJECT-REF.supabase.co",
+  "SUPABASE_ANON_KEY": "eyJhbGciOi..."
+}
+```
+
+`dart_defines.json` đã được **git-ignore**, nên khoá không bị đẩy lên GitHub.
+
+```bash
+flutter run --dart-define-from-file=dart_defines.json
+```
+
+Hoặc truyền trực tiếp (không cần file):
 
 ```bash
 flutter run --dart-define=SUPABASE_URL=https://YOUR-PROJECT-REF.supabase.co \
@@ -80,20 +92,33 @@ flutter run --dart-define=SUPABASE_URL=https://YOUR-PROJECT-REF.supabase.co \
 ```
 
 > ⚠️ Nếu màn hình đầu tiên hiện hướng dẫn 3 bước nghĩa là khoá vẫn còn là placeholder.
+> Đừng sửa `lib/core/config.dart` để hard-code khoá — file đó được commit.
 
-### 4. (Nếu thiếu) sinh lại Gradle wrapper
-Repo này **không commit file nhị phân** `gradle-wrapper.jar`. Nếu máy bạn chưa có nó, chạy một lần tại thư mục gốc:
+### 4. Android SDK cần có
+Repo dùng template **Flutter 3.47** (Kotlin DSL, AGP 9.1, Kotlin 2.4, Gradle 9.3.1) và đã commit sẵn Gradle wrapper — **không cần chạy `flutter create` lại**.
+
+`android/app/build.gradle.kts` ghim cứng các thành phần SDK đang cài trên máy dev:
+
+| Thành phần | Giá trị | Ghi chú |
+|---|---|---|
+| `compileSdk` | `37` | SDK Platform 17 (API 37.0) |
+| `buildToolsVersion` | `36.0.0` | |
+| `ndkVersion` | không dùng | app + plugin đều thuần Java/Kotlin |
+
+Ghim cứng để Gradle **không tự tải** package qua `sdkmanager` (trên một số máy, `sdkmanager` phiên bản mới bị crash).
+Nếu máy bạn có platform/build-tools khác, sửa 2 dòng đó cho khớp — hoặc để `flutter.compileSdkVersion` như template gốc.
+
+Nếu Flutter yêu cầu NDK (mặc định `28.2.13676358` = r28c), cài một lần bằng Android Studio SDK Manager hoặc:
 
 ```bash
-flutter create --platforms android --org com.quanlyrau .
+sdkmanager --install "ndk;28.2.13676358"
 ```
-
-Lệnh trên chỉ **bổ sung các file còn thiếu** (wrapper, `.metadata`…) và **không ghi đè** mã nguồn đã có (`AndroidManifest.xml`, `MainActivity.kt`, `lib/`…).
 
 ### 5. Chạy thử
 ```bash
 flutter pub get
-flutter run
+flutter devices          # xem máy Android đã kết nối
+flutter run -d <device-id> --dart-define-from-file=dart_defines.json
 ```
 
 ---
@@ -184,6 +209,41 @@ Nếu bạn cần nhiều người dùng hoặc dữ liệu nhạy cảm:
 2. `ALTER TABLE ... ENABLE ROW LEVEL SECURITY;` và tạo policy `FOR ALL USING (owner_id = auth.uid())` (mẫu đã comment sẵn cuối file SQL).
 3. Bật **Anonymous sign-ins** trong Supabase Auth (app đã gọi `signInAnonymously()` khi có mạng).
 4. Không bao giờ đưa `service_role` key vào app.
+
+---
+
+## 🖥 Ghi chú cho máy dev hiện tại (Windows)
+
+Máy này có vài điểm khác thường, đã được xử lý sẵn trong repo:
+
+| Vấn đề gặp phải | Cách đã xử lý |
+|---|---|
+| `sdkmanager` (Android CLI mới) **crash** khi `--install` (mã `0xC0000409`) | `android.builder.sdkDownload=false` để Gradle báo lỗi rõ ràng thay vì gọi tool hỏng; các SDK package cần thiết đã cài thủ công |
+| Flutter 3.47 mặc định đòi NDK `28.2.13676358` (r28c) | Đã cài NDK thật vào `%LOCALAPPDATA%\Android\Sdk\ndk\28.2.13676358` (tải `android-ndk-r28c-windows.zip`) |
+| Kotlin báo *"this and base files have different roots"* (pub cache ở `C:`, project ở `D:`) | `kotlin.incremental=false` trong `android/gradle.properties` |
+| Thiếu platform cho plugin (`app_links` cần 36, `connectivity_plus` cần 34…) | Đã cài `platforms;android-33/34/35/36` + có sẵn `android-37.0`; `build-tools 36.0.0` |
+
+**Kiểm tra nhanh trước khi chạy:**
+
+```powershell
+flutter doctor -v          # phải thấy "Android toolchain ✓" và JDK của Android Studio
+adb devices                # phải thấy thiết bị ở trạng thái "device" (không phải "unauthorized")
+```
+
+Nếu `adb devices` hiện `unauthorized`: mở khoá điện thoại → bấm **Cho phép / Allow** ở hộp thoại
+"Allow USB debugging?" (nhớ tick *Always allow from this computer*). Với máy OPPO/Realme (ColorOS),
+bật thêm **Cài đặt qua USB / Install via USB** trong *Tuỳ chọn nhà phát triển*, nếu không sẽ bị
+`INSTALL_FAILED_USER_RESTRICTED`.
+
+**Chạy app lên điện thoại:**
+
+```powershell
+cd "D:\1. Projects\Quan Ly Rau"
+flutter run -d <device-id> --dart-define-from-file=dart_defines.json
+```
+
+Hoặc mở project bằng Android Studio → chọn thiết bị → **Run**.
+APK debug sau khi build nằm ở `build\app\outputs\flutter-apk\app-debug.apk` (có thể copy sang máy và cài trực tiếp).
 
 ---
 

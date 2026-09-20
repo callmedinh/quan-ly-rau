@@ -39,3 +39,10 @@ extensions/
 
 # Local runtime overrides for development only
 .env
+
+# Real Supabase credentials (see dart_defines.example.json)
+dart_defines.json
+
+# Locally built APKs handed to testers + test screenshots
+dist/
+.screen.png

@@ -155,7 +155,7 @@ class _PendingOrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final supplierInitial = order.supplierName.isEmpty
+    final supplierInitial = (order.supplierName ?? '').isEmpty
         ? '?'
         : order.supplierName![0].toUpperCase();
     return Padding(
